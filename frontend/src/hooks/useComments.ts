@@ -1,34 +1,45 @@
-import { useEffect, useRef, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { useEffect, useState } from "react"
+import { io, Socket } from "socket.io-client"
 
-// Use environment variable for production, fallback to localhost for development
-const SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+interface Comment {
+  id: string;
+  text: string;
+  timestamp: string;
+  author: {
+    name?: string | null;
+    email: string;
+    image?: string | null;
+  };
+}
 
 export function useComments(docId: string, userId: string) {
-  const [comments, setComments] = useState<any[]>([]);
-  const socketRef = useRef<Socket | null>(null);
+  const [comments, setComments] = useState<Comment[]>([])
+  const [socket, setSocket] = useState<Socket | null>(null)
 
   useEffect(() => {
-    socketRef.current = io(SERVER_URL);
+    const socketConnection = io("http://localhost:4000")
+    setSocket(socketConnection)
 
-    socketRef.current.emit("joinComments", docId);
+    socketConnection.emit("joinComments", docId)
 
-    socketRef.current.on("commentsList", (allComments: any[]) => {
-      setComments(allComments);
-    });
+    socketConnection.on("commentsList", (commentsList: Comment[]) => {
+      setComments(commentsList)
+    })
 
-    socketRef.current.on("commentAdded", (comment: any) => {
-      setComments((prev) => [...prev, comment]);
-    });
+    socketConnection.on("commentAdded", (comment: Comment) => {
+      setComments(prev => [...prev, comment])
+    })
 
     return () => {
-      socketRef.current?.disconnect();
-    };
-  }, [docId]);
+      socketConnection.disconnect()
+    }
+  }, [docId])
 
   const postComment = (text: string) => {
-    socketRef.current?.emit("newComment", { docId, userId, text });
-  };
+    if (socket) {
+      socket.emit("newComment", { docId, userId, text })
+    }
+  }
 
-  return { comments, postComment };
+  return { comments, postComment }
 }

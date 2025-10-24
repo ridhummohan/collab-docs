@@ -1,33 +1,52 @@
 "use client"
 import { useSession } from "next-auth/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import Avatar from "@/components/Avatar"
-import { API_URL } from '@/config'
+
+interface Document {
+  id: string;
+  title: string;
+  updatedAt: string;
+  author: {
+    id: string;
+    name?: string | null;
+    email: string;
+    image?: string | null;
+  };
+}
+
+interface SharedDocument {
+  id: string;
+  sharedAt: string;
+  document: Document;
+}
 
 export default function HomePage() {
-  const [myDocs, setMyDocs] = useState([])
-  const [sharedDocs, setSharedDocs] = useState([])
+  const [myDocs, setMyDocs] = useState<Document[]>([])
+  const [sharedDocs, setSharedDocs] = useState<SharedDocument[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const { data: session } = useSession()
 
-  const fetchDocuments = () => {
+  const fetchDocuments = useCallback(() => {
     if (session?.user?.id) {
       Promise.all([
-        fetch(`${API_URL}/api/documents?authorId=${session.user.id}`).then(res => res.json()),
-        fetch(`${API_URL}/api/documents/shared?userId=${session.user.id}`).then(res => res.json())
+        fetch(`http://localhost:5000/api/documents?authorId=${session.user.id}`).then(res => res.json()),
+        fetch(`http://localhost:5000/api/documents/shared?userId=${session.user.id}`).then(res => res.json())
       ]).then(([docs, shared]) => {
         setMyDocs(docs)
         setSharedDocs(shared)
         setLoading(false)
+      }).catch(() => {
+        setLoading(false)
       })
     }
-  }
+  }, [session?.user?.id])
 
   useEffect(() => {
     fetchDocuments()
-  }, [session])
+  }, [fetchDocuments])
 
   const handleDelete = async (docId: string, e: React.MouseEvent) => {
     e.preventDefault()
@@ -40,18 +59,17 @@ export default function HomePage() {
     setDeletingId(docId)
 
     try {
-      const res = await fetch(`${API_URL}/api/documents/${docId}?userId=${session?.user?.id}`, {
+      const res = await fetch(`http://localhost:5000/api/documents/${docId}?userId=${session?.user?.id}`, {
         method: "DELETE"
       })
 
       if (res.ok) {
-        // Remove from local state
-        setMyDocs(myDocs.filter((doc: any) => doc.id !== docId))
+        setMyDocs(myDocs.filter((doc) => doc.id !== docId))
       } else {
-        const err = await res.json()
-        alert(err.error || "Failed to delete document")
+        const error = await res.json()
+        alert(error.error || "Failed to delete document")
       }
-    } catch (err) {
+    } catch {
       alert("Error deleting document")
     } finally {
       setDeletingId(null)
@@ -66,15 +84,15 @@ export default function HomePage() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: 'calc(100vh - 64px)',
-        gap: '24px'
+        gap: 24
       }}>
-        <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-          <h1 style={{ fontSize: '48px', marginBottom: '16px' }}>📝 CollabDocs</h1>
-          <p style={{ fontSize: '18px', color: 'var(--text-secondary)', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 500 }}>
+          <h1 style={{ fontSize: 48, marginBottom: 16 }}>📝 CollabDocs</h1>
+          <p style={{ fontSize: 18, color: 'var(--text-secondary)', marginBottom: 32 }}>
             Create, edit, and collaborate on documents in real-time with your team.
           </p>
           <Link href="/login">
-            <button style={{ padding: '12px 32px', fontSize: '16px' }}>
+            <button style={{ padding: '12px 32px', fontSize: 16 }}>
               Get Started
             </button>
           </Link>
@@ -92,18 +110,18 @@ export default function HomePage() {
   }
 
   return (
-    <div className="container" style={{ paddingTop: '40px', paddingBottom: '40px' }}>
-      <section style={{ marginBottom: '48px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 500 }}>My Documents</h2>
+    <div className="container" style={{ paddingTop: 40, paddingBottom: 40 }}>
+      <section style={{ marginBottom: 48 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 500 }}>My Documents</h2>
           <Link href="/create">
             <button>+ Create New</button>
           </Link>
         </div>
         
         {myDocs.length === 0 ? (
-          <div className="card" style={{ textAlign: 'center', padding: '48px' }}>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          <div className="card" style={{ textAlign: 'center', padding: 48 }}>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: 16 }}>
               No documents yet. Create your first document to get started!
             </p>
             <Link href="/create">
@@ -114,9 +132,9 @@ export default function HomePage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '20px'
+            gap: 20
           }}>
-            {myDocs.map((doc: any) => (
+            {myDocs.map((doc) => (
               <div key={doc.id} style={{ position: 'relative' }}>
                 <Link href={`/doc/${doc.id}`}>
                   <div className="card" style={{
@@ -124,22 +142,22 @@ export default function HomePage() {
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '12px'
+                    gap: 12
                   }}>
                     <div style={{
                       width: '100%',
-                      height: '120px',
+                      height: 120,
                       backgroundColor: 'var(--bg-light)',
                       borderRadius: 'var(--radius-sm)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '48px'
+                      fontSize: 48
                     }}>
                       📄
                     </div>
                     <h3 style={{
-                      fontSize: '16px',
+                      fontSize: 16,
                       fontWeight: 500,
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -147,20 +165,26 @@ export default function HomePage() {
                     }}>
                       {doc.title}
                     </h3>
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                       Edited {new Date(doc.updatedAt).toLocaleDateString()}
                     </p>
                   </div>
                 </Link>
-                  <button
-                    onClick={e => handleDelete(doc.id, e)}
-                    disabled={deletingId === doc.id}
-                    className="danger"
-                    style={{ position: 'absolute', top: 12, right: 12, padding: '6px 12px', fontSize: '12px' }}
-                  >
-                    {deletingId === doc.id ? '...' : '🗑️ Delete'}
-                  </button>
-
+                <button
+                  onClick={(e) => handleDelete(doc.id, e)}
+                  disabled={deletingId === doc.id}
+                  className="danger"
+                  style={{
+                    position: 'absolute',
+                    top: 12,
+                    right: 12,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    zIndex: 10
+                  }}
+                >
+                  {deletingId === doc.id ? '...' : '🗑️ Delete'}
+                </button>
               </div>
             ))}
           </div>
@@ -168,12 +192,12 @@ export default function HomePage() {
       </section>
 
       <section>
-        <h2 style={{ fontSize: '24px', fontWeight: 500, marginBottom: '24px' }}>
+        <h2 style={{ fontSize: 24, fontWeight: 500, marginBottom: 24 }}>
           Shared with Me
         </h2>
         
         {sharedDocs.length === 0 ? (
-          <div className="card" style={{ padding: '32px', textAlign: 'center' }}>
+          <div className="card" style={{ padding: 32, textAlign: 'center' }}>
             <p style={{ color: 'var(--text-secondary)' }}>
               No documents shared with you yet.
             </p>
@@ -182,31 +206,31 @@ export default function HomePage() {
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '20px'
+            gap: 20
           }}>
-            {sharedDocs.map((share: any) => (
+            {sharedDocs.map((share) => (
               <Link href={`/doc/${share.document.id}`} key={share.id}>
                 <div className="card" style={{
                   cursor: 'pointer',
                   height: '100%',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '12px'
+                  gap: 12
                 }}>
                   <div style={{
                     width: '100%',
-                    height: '120px',
+                    height: 120,
                     backgroundColor: 'var(--bg-light)',
                     borderRadius: 'var(--radius-sm)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '48px'
+                    fontSize: 48
                   }}>
                     🤝
                   </div>
                   <h3 style={{
-                    fontSize: '16px',
+                    fontSize: 16,
                     fontWeight: 500,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -214,17 +238,17 @@ export default function HomePage() {
                   }}>
                     {share.document.title}
                   </h3>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <Avatar 
                       src={share.document.author.image} 
                       alt={share.document.author.name || 'User'} 
                       size={24} 
                     />
-                    <p style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                    <p style={{ fontSize: 12, color: 'var(--text-secondary)' }}>
                       {share.document.author.name}
                     </p>
                   </div>
-                  <p style={{ fontSize: '12px', color: 'var(--text-light)' }}>
+                  <p style={{ fontSize: 12, color: 'var(--text-light)' }}>
                     Shared {new Date(share.sharedAt).toLocaleDateString()}
                   </p>
                 </div>

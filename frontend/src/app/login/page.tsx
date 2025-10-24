@@ -3,7 +3,6 @@ import { signIn } from "next-auth/react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { API_URL } from '@/config'
 
 export default function LoginPage() {
   const { data: session, status } = useSession()
@@ -32,23 +31,23 @@ export default function LoginPage() {
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
     }}>
       <div className="card" style={{
-        maxWidth: '420px',
+        maxWidth: 420,
         width: '100%',
-        margin: '20px',
-        padding: '48px',
+        margin: 20,
+        padding: 48,
         textAlign: 'center'
       }}>
-        <div style={{ fontSize: '64px', marginBottom: '24px' }}>📝</div>
+        <div style={{ fontSize: 64, marginBottom: 24 }}>📝</div>
         
-        <h1 style={{ fontSize: '32px', fontWeight: 600, marginBottom: '12px' }}>
+        <h1 style={{ fontSize: 32, fontWeight: 600, marginBottom: 12 }}>
           Welcome to CollabDocs
         </h1>
         
         <p style={{ 
           color: 'var(--text-secondary)', 
-          marginBottom: '32px',
-          fontSize: '16px',
-          lineHeight: '1.6'
+          marginBottom: 32,
+          fontSize: 16,
+          lineHeight: 1.6
         }}>
           Create, edit, and collaborate on documents in real-time with your team.
         </p>
@@ -58,11 +57,11 @@ export default function LoginPage() {
           style={{
             width: '100%',
             padding: '14px 24px',
-            fontSize: '16px',
+            fontSize: 16,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '12px',
+            gap: 12,
             backgroundColor: 'white',
             color: 'var(--text-primary)',
             border: '1px solid var(--border-color)',
@@ -80,11 +79,11 @@ export default function LoginPage() {
         </button>
 
         <div style={{ 
-          marginTop: '32px', 
-          paddingTop: '24px', 
+          marginTop: 32, 
+          paddingTop: 24, 
           borderTop: '1px solid var(--border-color)' 
         }}>
-          <p style={{ fontSize: '14px', color: 'var(--text-light)' }}>
+          <p style={{ fontSize: 14, color: 'var(--text-light)' }}>
             By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>

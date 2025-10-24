@@ -3,7 +3,6 @@ import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { API_URL } from '@/config'
 
 export default function CreateDocPage() {
   const [title, setTitle] = useState("")
@@ -22,9 +21,9 @@ export default function CreateDocPage() {
 
   if (!session) {
     return (
-      <div className="container" style={{ paddingTop: '80px', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '16px' }}>Authentication Required</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+      <div className="container" style={{ paddingTop: 80, textAlign: "center" }}>
+        <h2 style={{ marginBottom: 16 }}>Authentication Required</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: 24 }}>
           Please sign in to create a document.
         </p>
         <Link href="/login">
@@ -44,7 +43,7 @@ export default function CreateDocPage() {
     setError("")
 
     try {
-      const res = await fetch(`${API_URL}/api/documents`, {
+      const res = await fetch("http://localhost:5000/api/documents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -61,19 +60,19 @@ export default function CreateDocPage() {
 
       const doc = await res.json()
       router.push(`/doc/${doc.id}`)
-    } catch (err: any) {
+    } catch (err) {
       console.error(err)
-      setError(err.message || "Unable to create document")
+      setError(err instanceof Error ? err.message : "Unable to create document")
       setIsCreating(false)
     }
   }
 
   return (
-    <div className="container" style={{ paddingTop: '60px', maxWidth: '600px' }}>
-      <div className="card" style={{ padding: '40px' }}>
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ fontSize: '64px', marginBottom: '16px' }}>📝</div>
-          <h1 style={{ fontSize: '28px', fontWeight: 500, marginBottom: '8px' }}>
+    <div className="container" style={{ paddingTop: 60, maxWidth: 600 }}>
+      <div className="card" style={{ padding: 40 }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>📝</div>
+          <h1 style={{ fontSize: 28, fontWeight: 500, marginBottom: 8 }}>
             Create New Document
           </h1>
           <p style={{ color: 'var(--text-secondary)' }}>
@@ -81,12 +80,12 @@ export default function CreateDocPage() {
           </p>
         </div>
 
-        <div style={{ marginBottom: '24px' }}>
+        <div style={{ marginBottom: 24 }}>
           <label style={{ 
             display: 'block', 
-            fontSize: '14px', 
+            fontSize: 14, 
             fontWeight: 500,
-            marginBottom: '8px',
+            marginBottom: 8,
             color: 'var(--text-primary)'
           }}>
             Document Title
@@ -103,7 +102,7 @@ export default function CreateDocPage() {
               }
             }}
             autoFocus
-            style={{ fontSize: '16px' }}
+            style={{ fontSize: 16 }}
           />
         </div>
 
@@ -113,24 +112,24 @@ export default function CreateDocPage() {
             backgroundColor: '#fce8e6',
             color: 'var(--danger-color)',
             borderRadius: 'var(--radius-sm)',
-            marginBottom: '16px',
-            fontSize: '14px'
+            marginBottom: 16,
+            fontSize: 14
           }}>
             {error}
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: 12 }}>
           <button 
             disabled={!title.trim() || isCreating} 
             onClick={handleCreate}
-            style={{ flex: 1, padding: '12px', fontSize: '16px' }}
+            style={{ flex: 1, padding: 12, fontSize: 16 }}
           >
             {isCreating ? (
-              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
                 <div style={{ 
-                  width: '16px', 
-                  height: '16px', 
+                  width: 16, 
+                  height: 16, 
                   border: '2px solid white', 
                   borderTopColor: 'transparent',
                   borderRadius: '50%',
@@ -143,7 +142,7 @@ export default function CreateDocPage() {
             )}
           </button>
           <Link href="/" style={{ flex: 1 }}>
-            <button className="secondary" style={{ width: '100%', padding: '12px', fontSize: '16px' }}>
+            <button className="secondary" style={{ width: '100%', padding: 12, fontSize: 16 }}>
               Cancel
             </button>
           </Link>

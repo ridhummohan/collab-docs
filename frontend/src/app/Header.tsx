@@ -1,5 +1,5 @@
 "use client"
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import Avatar from "../components/Avatar"
 
@@ -47,9 +47,9 @@ export default function Header() {
                   {session.user.email}
                 </span>
               </div>
-              <a href="/api/auth/signout">
-                <button className="secondary">Logout</button>
-              </a>
+              <button className="secondary" onClick={() => signOut()}>
+                Logout
+              </button>
             </div>
           </div>
         ) : (
