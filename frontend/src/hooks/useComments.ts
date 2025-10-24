@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-const SERVER_URL = "http://localhost:4000";
+// Use environment variable for production, fallback to localhost for development
+const SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
 
 export function useComments(docId: string, userId: string) {
   const [comments, setComments] = useState<any[]>([]);

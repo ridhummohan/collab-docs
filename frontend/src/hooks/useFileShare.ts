@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 
-const SERVER_URL = "http://localhost:4000"; // Socket.IO server
+// Use environment variable for production, fallback to localhost for development
+const SERVER_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export interface SharedFile {
   id: string;
@@ -36,7 +38,7 @@ export function useFileShare(docId: string) {
     formData.append("documentId", docId);
     formData.append("uploaderId", uploaderId);
 
-    const res = await fetch("http://localhost:5000/api/files", {
+    const res = await fetch(`${API_URL}/api/files`, {
       method: "POST",
       body: formData
     });

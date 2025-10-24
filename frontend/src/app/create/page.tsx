@@ -3,6 +3,7 @@ import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
+import { API_URL } from '@/config'
 
 export default function CreateDocPage() {
   const [title, setTitle] = useState("")
@@ -43,7 +44,7 @@ export default function CreateDocPage() {
     setError("")
 
     try {
-      const res = await fetch("http://localhost:5000/api/documents", {
+      const res = await fetch(`${API_URL}/api/documents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
