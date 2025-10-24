@@ -12,6 +12,11 @@ app.use(express.json());
 
 // ===== REST API ENDPOINTS =====
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true
+}));
+
 // Get user's own documents
 app.get("/api/documents", async (req, res) => {
   try {
@@ -163,8 +168,9 @@ app.listen(5000, () => {
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
