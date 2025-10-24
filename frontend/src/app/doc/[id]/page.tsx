@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react"
 import React from "react"
 import Avatar from "@/components/Avatar"
 import Link from "next/link"
+import { API_URL } from "@/config"
 
 export default function DocPage() {
   const { id } = useParams()
@@ -39,7 +40,7 @@ export default function DocPage() {
       
       try {
         // Try owner endpoint
-        let resp = await fetch(`http://localhost:5000/api/documents?authorId=${userId}`)
+        let resp = await fetch(`${API_URL}/api/documents?authorId=${userId}`)
         const docs = await resp.json()
         const doc = docs.find((d: { id: string }) => d.id === id)
         
@@ -48,7 +49,7 @@ export default function DocPage() {
           setAuthor(doc.author)
           setIsOwner(true)
         } else {
-          resp = await fetch(`http://localhost:5000/api/documents/shared?userId=${userId}`)
+          resp = await fetch(`${API_URL}/api/documents/shared?userId=${userId}`)
           const sd = await resp.json()
           const share = sd.find((s: { document: { id: string } }) => s.document.id === id)
           
@@ -86,7 +87,7 @@ export default function DocPage() {
     setDeleting(true)
     
     try {
-      const res = await fetch(`http://localhost:5000/api/documents/${id}?userId=${userId}`, {
+      const res = await fetch(`${API_URL}/api/documents/${id}?userId=${userId}`, {
         method: "DELETE"
       })
       
@@ -107,7 +108,7 @@ export default function DocPage() {
     if (!shareEmail.trim()) return setShareMsg("Enter an email")
     
     try {
-      const res = await fetch("http://localhost:5000/api/documents/share", {
+      const res = await fetch(`${API_URL}/api/documents/share`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ documentId: id, shareWithEmail: shareEmail })

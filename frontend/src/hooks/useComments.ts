@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { io, Socket } from "socket.io-client"
 
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:4000"
+
 interface Comment {
   id: string;
   text: string;
@@ -17,7 +19,7 @@ export function useComments(docId: string, userId: string) {
   const [socket, setSocket] = useState<Socket | null>(null)
 
   useEffect(() => {
-    const socketConnection = io("http://localhost:4000")
+    const socketConnection = io(SOCKET_URL)
     setSocket(socketConnection)
 
     socketConnection.emit("joinComments", docId)

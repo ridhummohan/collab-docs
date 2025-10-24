@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react"
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import Avatar from "@/components/Avatar"
+import { API_URL } from "@/config"
 
 interface Document {
   id: string;
@@ -32,8 +33,8 @@ export default function HomePage() {
   const fetchDocuments = useCallback(() => {
     if (session?.user?.id) {
       Promise.all([
-        fetch(`http://localhost:5000/api/documents?authorId=${session.user.id}`).then(res => res.json()),
-        fetch(`http://localhost:5000/api/documents/shared?userId=${session.user.id}`).then(res => res.json())
+        fetch(`${API_URL}/api/documents?authorId=${session.user.id}`).then(res => res.json()),
+        fetch(`${API_URL}/api/documents/shared?userId=${session.user.id}`).then(res => res.json())
       ]).then(([docs, shared]) => {
         setMyDocs(docs)
         setSharedDocs(shared)
@@ -59,7 +60,7 @@ export default function HomePage() {
     setDeletingId(docId)
 
     try {
-      const res = await fetch(`http://localhost:5000/api/documents/${docId}?userId=${session?.user?.id}`, {
+      const res = await fetch(`${API_URL}/api/documents/${docId}?userId=${session?.user?.id}`, {
         method: "DELETE"
       })
 
